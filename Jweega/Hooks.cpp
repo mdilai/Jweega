@@ -510,9 +510,6 @@ Hooks::Hooks(HMODULE cheatModule) : module{ cheatModule }
         *memory->dispatchSound = uintptr_t(dispatchSound) - uintptr_t(memory->dispatchSound + 1);
         VirtualProtect(memory->dispatchSound, 4, oldProtection, nullptr);
     }
-
-    interfaces->gameUI->messageBox("Jweega", "Jweega has been successfully loaded!\n\n"
-        "Build time: " __DATE__ ", " __TIME__ "");
 }
 
 void Hooks::restore() noexcept
