@@ -54,8 +54,10 @@ public:
     VIRTUAL_METHOD(Entity*, getActiveWeapon, 267, (), (this))
     VIRTUAL_METHOD(int, getWeaponSubType, 281, (), (this))
     VIRTUAL_METHOD(Entity*, getObserverTarget, 294, (), (this))
+    VIRTUAL_METHOD(float, getSpread, 452, (), (this))
     VIRTUAL_METHOD(WeaponData*, getWeaponData, 460, (), (this))
     VIRTUAL_METHOD(float, getInaccuracy, 482, (), (this))
+    VIRTUAL_METHOD(float, updateAccuracyPenalty, 483, (), (this))
 
     constexpr auto getWeaponType() noexcept
     {
@@ -144,50 +146,6 @@ public:
         return memory->isOtherEnemy(this, interfaces->entityList->getEntity(interfaces->engine->getLocalPlayer()));
     }
 
-    constexpr ClientClass* getClientClass() noexcept
-    {
-        return callVirtualMethod<ClientClass*>(this + 8, 2);
-    }
-
-    constexpr bool isAlive() noexcept
-    {
-        return callVirtualMethod<bool>(this, 155) && health() > 0;
-    }
-
-    constexpr bool isPlayer() noexcept
-    {
-        return callVirtualMethod<bool>(this, 157);
-    }
-
-    constexpr Entity* getActiveWeapon() noexcept
-    {
-        return callVirtualMethod<Entity*>(this, 267);
-    }
-
-    constexpr int getWeaponSubType() noexcept
-    {
-        return callVirtualMethod<int>(this, 281);
-    }
-
-    constexpr WeaponData* getWeaponData() noexcept
-    {
-        return callVirtualMethod<WeaponData*>(this, 459);
-    }
-
-    constexpr float getInaccuracy() noexcept
-    {
-        return callVirtualMethod<float>(this, 481);
-    }
-
-    constexpr void updateAccuracyPenalty() noexcept
-    {
-        return callVirtualMethod<void>(this, 482);
-    }
-
-    constexpr float getSpread() noexcept
-    {
-        return callVirtualMethod<float>(this, 451);
-    }
     
     VarMap* getVarMap() noexcept
     {

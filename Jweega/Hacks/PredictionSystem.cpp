@@ -13,7 +13,7 @@ static float previousFrametime{ 0.0f };
 
 void PredictionSystem::StartPrediction(UserCmd* cmd) noexcept
 {
-    const auto localPlayer{ interfaces.entityList->getEntity(interfaces.engine->getLocalPlayer()) };
+    const auto localPlayer{ interfaces->entityList->getEntity(interfaces.engine->getLocalPlayer()) };
     if (!localPlayer || !cmd)
         return;
 

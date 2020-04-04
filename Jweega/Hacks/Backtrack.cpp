@@ -75,7 +75,7 @@ void Backtrack::run(UserCmd* cmd) noexcept
 
         auto origin = entity->getAbsOrigin();
 
-        auto angle = Aimbot::calculateRelativeAngle(localPlayerEyePosition, origin, cmd->viewangles + (config.backtrack.recoilBasedFov ? aimPunch : Vector{ }));
+        auto angle = Aimbot::calculateRelativeAngle(localPlayerEyePosition, origin, cmd->viewangles + (config->backtrack.recoilBasedFov ? aimPunch : Vector{ }));
         const auto fov{ angle.length2D() };
         if (fov < bestFov) {
             bestFov = fov;
@@ -96,7 +96,7 @@ void Backtrack::run(UserCmd* cmd) noexcept
             if (!valid(record.simulationTime))
                 continue;
 
-            auto angle = Aimbot::calculateRelativeAngle(localPlayerEyePosition, record.origin, cmd->viewangles + (config.backtrack.recoilBasedFov ? aimPunch : Vector{ }));
+            auto angle = Aimbot::calculateRelativeAngle(localPlayerEyePosition, record.origin, cmd->viewangles + (config->backtrack.recoilBasedFov ? aimPunch : Vector{ }));
             const auto fov{ angle.length2D() };
             if (fov < bestFov) {
                 bestFov = fov;

@@ -104,7 +104,7 @@ void Misc::updateClanTag(bool tagChanged) noexcept
 
 void Misc::spectatorList() noexcept
 {
-    if (config->misc.spectatorList.enabled && interfaces.engine->isInGame()) {
+    if (config->misc.spectatorList.enabled && interfaces->engine->isInGame()) {
         auto localPlayer = interfaces->entityList->getEntity(interfaces->engine->getLocalPlayer());
 
         if (!localPlayer->isAlive()) {
@@ -113,35 +113,36 @@ void Misc::spectatorList() noexcept
             localPlayer = localPlayer->getObserverTarget();
         }
 
-    if (!localPlayer || !localPlayer->isAlive())
-        return;
+        if (!localPlayer || !localPlayer->isAlive())
+            return;
 
-    interfaces->surface->setTextFont(Surface::font);
+        interfaces->surface->setTextFont(Surface::font);
 
-    if (config->misc.spectatorList.rainbow)
-        interfaces->surface->setTextColor(rainbowColor(memory->globalVars->realtime, config->misc.spectatorList.rainbowSpeed));
-    else
-        interfaces->surface->setTextColor(config->misc.spectatorList.color);
+        if (config->misc.spectatorList.rainbow)
+            interfaces->surface->setTextColor(rainbowColor(memory->globalVars->realtime, config->misc.spectatorList.rainbowSpeed));
+        else
+            interfaces->surface->setTextColor(config->misc.spectatorList.color);
 
-    const auto [width, height] = interfaces->surface->getScreenSize();
+        const auto [width, height] = interfaces->surface->getScreenSize();
 
-    auto textPositionY = static_cast<int>(0.5f * height);
+        auto textPositionY = static_cast<int>(0.5f * height);
 
-    for (int i = 1; i <= interfaces->engine->getMaxClients(); ++i) {
-        const auto entity = interfaces->entityList->getEntity(i);
-        if (!entity || entity->isDormant() || entity->isAlive() || entity->getObserverTarget() != localPlayer)
-            continue;
+        for (int i = 1; i <= interfaces->engine->getMaxClients(); ++i) {
+            const auto entity = interfaces->entityList->getEntity(i);
+            if (!entity || entity->isDormant() || entity->isAlive() || entity->getObserverTarget() != localPlayer)
+                continue;
 
-        PlayerInfo playerInfo;
+            PlayerInfo playerInfo;
 
-        if (!interfaces->engine->getPlayerInfo(i, playerInfo))
-            continue;
+            if (!interfaces->engine->getPlayerInfo(i, playerInfo))
+                continue;
 
-        if (wchar_t name[128]; MultiByteToWideChar(CP_UTF8, 0, playerInfo.name, -1, name, 128)) {
-            const auto [textWidth, textHeight] = interfaces->surface->getTextSize(Surface::font, name);
-            interfaces->surface->setTextPosition(width - textWidth - 5, textPositionY);
-            textPositionY -= textHeight;
-            interfaces->surface->printText(name);
+            if (wchar_t name[128]; MultiByteToWideChar(CP_UTF8, 0, playerInfo.name, -1, name, 128)) {
+                const auto [textWidth, textHeight] = interfaces->surface->getTextSize(Surface::font, name);
+                interfaces->surface->setTextPosition(width - textWidth - 5, textPositionY);
+                textPositionY -= textHeight;
+                interfaces->surface->printText(name);
+            }
         }
     }
 }
@@ -616,4 +617,69 @@ void Misc::playHitSound(GameEvent& event) noexcept
 
     if (static_cast<std::size_t>(config->misc.hitSound - 1) < hitSounds.size())
         interfaces->engine->clientCmdUnrestricted(hitSounds[config->misc.hitSound - 1]);
+}
+
+void Misc::drawFov() noexcept
+{
+    if (config->misc.drawFOV && interfaces->engine->isInGame()) {
+        const auto localPlayer{ interfaces->entityList->getEntity(interfaces->engine->getLocalPlayer()) };
+        if (!localPlayer || !localPlayer->isAlive())
+            return;
+
+        const auto activeWeapon{ localPlayer->getActiveWeapon() };
+        if (!activeWeapon)
+            return;
+
+        auto weaponIndex{ getWeaponIndex(activeWeapon->itemDefinitionIndex2()) };
+        if (!weaponIndex)
+            return;
+
+        auto weaponClass = getWeaponClass(activeWeapon->itemDefinitionIndex2());
+        if (!config->aimbot[weaponIndex].enabled)
+            weaponIndex = weaponClass;
+
+        if (!config->aimbot[weaponIndex].enabled)
+            weaponIndex = 0;
+
+        if (config->aimbot[weaponIndex].enabled) {
+
+            const auto [width, height] { interfaces->surface->getScreenSize() };
+
+            const auto actualFov{ std::atanf((static_cast<float>(width) / static_cast<float>(height)) * 0.75f * std::tanf(degreesToRadians(fov / 2.f))) };
+
+            if (config->aimbot[weaponIndex].silent)
+                interfaces->surface->setDrawColor(255, 10, 10, 255);
+            else
+                interfaces->surface->setDrawColor(10, 255, 10, 255);
+
+            auto radius{ static_cast<int>(std::tanf(degreesToRadians(config->aimbot[weaponIndex].fov) / 2.f) / std::tanf(actualFov) * width) };
+
+            interfaces->surface->drawCircle(width / 2, height / 2, radius, ++radius);
+        }
+    }
+}
+
+void Misc::fakeDuck(UserCmd* cmd) noexcept
+{
+
+    if (config->misc.fakeDuckKey
+        && GetAsyncKeyState(config->misc.fakeDuckKey))
+        if (const auto localPlayer{ interfaces->entityList->getEntity(interfaces->engine->getLocalPlayer()) };
+            localPlayer
+            && localPlayer->isAlive())
+            if (interfaces->engine->getNetworkChannel()->chokedPackets > (config->misc.chokedPackets / 2))
+                cmd->buttons |= UserCmd::IN_DUCK;
+            else
+                cmd->buttons &= ~UserCmd::IN_DUCK;
+}
+
+void Misc::fakeDuckFix(ViewSetup* setup) noexcept
+{
+    /*       if (config->misc.fakeDuckKey
+               && GetAsyncKeyState(config->misc.fakeDuckKey))
+               if (const auto localPlayer{ interfaces->entityList->getEntity(interfaces->engine->getLocalPlayer()) };
+                   localPlayer
+                   && localPlayer->isAlive()
+                   && localPlayer->flags() & 1)
+               setup->origin.z = localPlayer->getAbsOrigin().z + interfaces->gameMovement->getPlayerViewOffset(false).z;*/
 }

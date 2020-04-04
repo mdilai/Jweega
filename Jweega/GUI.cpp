@@ -248,9 +248,9 @@ void GUI::renderAimbotWindow(bool contentOnly) noexcept
     ImGui::SliderFloat("Recoil control y", &config->aimbot[currentWeapon].recoilControlY, 0.0f, 1.0f, "%.2f");
     ImGui::Checkbox("Standalone recoil control", &config->aimbot[currentWeapon].standaloneRecoilControl);
     ImGui::InputInt("Min damage", &config->aimbot[currentWeapon].minDamage);
-    config.aimbot[currentWeapon].minDamage = std::clamp(config->aimbot[currentWeapon].minDamage, 0, 250);
+    config->aimbot[currentWeapon].minDamage = std::clamp(config->aimbot[currentWeapon].minDamage, 0, 250);
     ImGui::InputInt("Hit chance", &config->aimbot[currentWeapon].hitChance);
-    config.aimbot[currentWeapon].hitChance = std::clamp(config->aimbot[currentWeapon].hitChance, 0, 100);
+    config->aimbot[currentWeapon].hitChance = std::clamp(config->aimbot[currentWeapon].hitChance, 0, 100);
     ImGui::Checkbox("Killshot", &config->aimbot[currentWeapon].killshot);
     ImGui::Checkbox("Between shots", &config->aimbot[currentWeapon].betweenShots);
     ImGui::Checkbox("Velocity extrapolation", &config->aimbot[currentWeapon].velocityExtrapolation);
@@ -1088,7 +1088,7 @@ void GUI::renderMiscWindow(bool contentOnly) noexcept
         hooks->restore();
 
         ImGui::Columns(1);
-        if (!config.style.menuStyle)
+        if (!config->style.menuStyle)
             ImGui::End();
 }
 

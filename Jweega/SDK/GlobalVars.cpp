@@ -19,5 +19,5 @@ float GlobalVars::serverTime(UserCmd* cmd) noexcept
     }
     return tick * intervalPerTick;*/
 
-    return interfaces.entityList->getEntity(interfaces.engine->getLocalPlayer())->tickBase() * memory.globalVars->intervalPerTick;
+    return interfaces->entityList->getEntity(interfaces->engine->getLocalPlayer())->tickBase() * memory->globalVars->intervalPerTick;
 }

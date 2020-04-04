@@ -511,7 +511,7 @@ Hooks::Hooks(HMODULE cheatModule) : module{ cheatModule }
         VirtualProtect(memory->dispatchSound, 4, oldProtection, nullptr);
     }
 
-    interfaces.gameUI->messageBox("Jweega", "Jweega has been successfully loaded!\n\n"
+    interfaces->gameUI->messageBox("Jweega", "Jweega has been successfully loaded!\n\n"
         "Build time: " __DATE__ ", " __TIME__ "");
 }
 
