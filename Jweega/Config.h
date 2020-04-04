@@ -2,6 +2,7 @@
 
 #include <array>
 #include <filesystem>
+#include <memory>
 #include <string>
 
 #include "imgui/imgui.h"
@@ -46,7 +47,6 @@ public:
         bool ignoreSmoke{ false };
         bool autoShot{ false };
         bool autoScope{ false };
-        bool recoilbasedFov{ false };
         float fov{ 0.0f };
         float smooth{ 1.0f };
         int bone{ 0 };
@@ -62,17 +62,18 @@ public:
     std::array<Aimbot, 40> aimbot;
 
     struct Triggerbot {
-        bool enabled{ false };
-        bool onKey{ false };
-        int key{ 0 };
-        bool friendlyFire{ false };
-        bool scopedOnly{ true };
-        bool ignoreFlash{ false };
-        bool ignoreSmoke{ false };
-        int hitgroup{ 0 };
-        int shotDelay{ 0 };
-        int minDamage{ 1 };
-        bool killshot{ false };
+        bool enabled = false;
+        bool friendlyFire = false;
+        bool scopedOnly = true;
+        bool ignoreFlash = false;
+        bool ignoreSmoke = false;
+        bool killshot = false;
+        bool onKey = false;
+        int key = 0;
+        int hitgroup = 0;
+        int shotDelay = 0;
+        int minDamage = 1;
+        float burstTime = 0.0f;
     };
     std::array<Triggerbot, 40> triggerbot;
 
@@ -86,8 +87,8 @@ public:
     struct {
         bool enabled{ false };
         bool pitch{ false };
-        float pitchAngle{ 0.0f };
         bool yaw{ false };
+        float pitchAngle{ 0.0f };
     } antiAim;
 
     struct Glow {
@@ -102,13 +103,13 @@ public:
 
     struct Chams {
         struct Material {
-            bool enabled{ false };
-            bool healthBased{ false };
+            bool enabled = false;
+            bool healthBased = false;
+            bool blinking = false;
+            bool wireframe = false;
             Color color;
-            bool blinking{ false };
-            int material{ 0 };
-            bool wireframe{ false };
-            float alpha{ 1.0f };
+            int material = 0;
+            float alpha = 1.0f;
         };
         std::array<Material, 2> materials;
     };
@@ -256,7 +257,6 @@ public:
         std::string killMessageString{ "Gotcha!" };
         bool nameStealer{ false };
         bool disablePanoramablur{ false };
-        std::string voteText;
         int banColor{ 6 };
         std::string banText{ "Cheater has been permanently banned from official CS:GO servers." };
         bool fastPlant{ false };
@@ -278,18 +278,18 @@ public:
 
     struct {
         bool enabled{ false };
-        int target{ 0 };
-        int delay{ 10 };
-        bool aimbot{ true };
-        bool wallhack{ true };
-        bool other{ true };
-        bool griefing{ false };
-        bool voiceAbuse{ false };
         bool textAbuse{ false };
+        bool griefing{ false };
+        bool wallhack{ true };
+        bool aimbot{ true };
+        bool other{ true };
+        int target{ 0 };
+        int delay{ 1 };
+        int rounds{ 1 };
     } reportbot;
 private:
     std::filesystem::path path;
     std::vector<std::string> configs;
 };
 
-extern Config config;
+inline std::unique_ptr<Config> config;
