@@ -622,7 +622,6 @@ void Misc::playHitSound(GameEvent& event) noexcept
 void Misc::drawFov() noexcept
 {
     if (config->misc.drawFOV && interfaces->engine->isInGame()) {
-        const auto localPlayer{ interfaces->entityList->getEntity(interfaces->engine->getLocalPlayer()) };
         if (!localPlayer || !localPlayer->isAlive())
             return;
 
@@ -664,9 +663,7 @@ void Misc::fakeDuck(UserCmd* cmd) noexcept
 
     if (config->misc.fakeDuckKey
         && GetAsyncKeyState(config->misc.fakeDuckKey))
-        if (const auto localPlayer{ interfaces->entityList->getEntity(interfaces->engine->getLocalPlayer()) };
-            localPlayer
-            && localPlayer->isAlive())
+        if (localPlayer && localPlayer->isAlive())
             if (interfaces->engine->getNetworkChannel()->chokedPackets > (config->misc.chokedPackets / 2))
                 cmd->buttons |= UserCmd::IN_DUCK;
             else
