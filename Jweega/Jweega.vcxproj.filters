@@ -379,5 +379,8 @@
     <ClInclude Include="SDK\Pad.h">
       <Filter>SDK</Filter>
     </ClInclude>
+    <ClInclude Include="SDK\LocalPlayer.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

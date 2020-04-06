@@ -231,8 +231,12 @@ static Entity* make_glove(int entry, int serial) noexcept
     return interfaces->entityList->getEntity(entry);
 }
 
-static void post_data_update_start(Entity* local) noexcept
+static void post_data_update_start(int localHandle) noexcept
 {
+    const auto local = interfaces->entityList->getEntityFromHandle(localHandle);
+    if (!local)
+        return;
+
     const auto local_index = local->index();
 
     if (!local->isAlive())
@@ -365,12 +369,15 @@ static constexpr void updateHud() noexcept
 
 void SkinChanger::run(FrameStage stage) noexcept
 {
+    static int localPlayerHandle = -1;
+
+    if (localPlayer)
+        localPlayerHandle = localPlayer->handle();
+
     if (stage == FrameStage::NET_UPDATE_POSTDATAUPDATE_START) {
-        if (const auto localPlayer = interfaces->entityList->getEntity(interfaces->engine->getLocalPlayer())) {
-            post_data_update_start(localPlayer);
-            if (hudUpdateRequired && !localPlayer->isDormant())
-                updateHud();
-        }
+        post_data_update_start(localPlayerHandle);
+        if (hudUpdateRequired && localPlayer && !localPlayer->isDormant())
+            updateHud();
     }
 }
 
@@ -382,7 +389,7 @@ void SkinChanger::scheduleHudUpdate() noexcept
 
 void SkinChanger::overrideHudIcon(GameEvent& event) noexcept
 {
-    if (interfaces->engine->getPlayerForUserID(event.getInt("attacker")) == interfaces->engine->getLocalPlayer()) {
+    if (localPlayer && interfaces->engine->getPlayerForUserID(event.getInt("attacker")) == localPlayer->index()) {
         if (const auto iconOverride = iconOverrides[event.getString("weapon")])
             event.setString("weapon", iconOverride);
     }

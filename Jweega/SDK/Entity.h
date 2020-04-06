@@ -6,6 +6,7 @@
 #include "Engine.h"
 #include "EngineTrace.h"
 #include "EntityList.h"
+#include "LocalPlayer.h"
 #include "matrix3x4.h"
 #include "ModelRender.h"
 #include "Utils.h"
@@ -41,10 +42,12 @@ public:
     VIRTUAL_METHOD(ClientClass*, getClientClass, 2, (), (this + 8))
     VIRTUAL_METHOD(void, preDataUpdate, 6, (int updateType), (this + 8, updateType))
     VIRTUAL_METHOD(bool, isDormant, 9, (), (this + 8))
+    VIRTUAL_METHOD(int, index, 10, (), (this + 8))
     VIRTUAL_METHOD(void, setDestroyedOnRecreateEntities, 13, (), (this + 8))
 
     VIRTUAL_METHOD(const Model*, getModel, 8, (), (this + 4))
 
+    VIRTUAL_METHOD(int&, handle, 2, (), (this))
     VIRTUAL_METHOD(Collideable*, getCollideable, 3, (), (this))
     VIRTUAL_METHOD(Vector&, getAbsOrigin, 10, (), (this))
     VIRTUAL_METHOD(void, setModelIndex, 75, (int index), (this, index))
@@ -135,15 +138,21 @@ public:
 
     bool isVisible(const Vector& position = { }) noexcept
     {
-        auto localPlayer = interfaces->entityList->getEntity(interfaces->engine->getLocalPlayer());
-        static Trace trace;
-        interfaces->engineTrace->traceRay({ localPlayer->getEyePosition(), position ? position : getBonePosition(8) }, 0x46004009, { localPlayer }, trace);
+        if (!localPlayer)
+            return false;
+
+        Trace trace;
+        interfaces->engineTrace->traceRay({ localPlayer->getEyePosition(), position ? position : getBonePosition(8) }, 0x46004009, { localPlayer.get() }, trace);
         return trace.entity == this || trace.fraction > 0.97f;
     }
 
     bool isEnemy() noexcept
     {
-        return memory->isOtherEnemy(this, interfaces->entityList->getEntity(interfaces->engine->getLocalPlayer()));
+        // SHOULD NEVER HAPPEN
+        if (!localPlayer)
+            return false;
+
+        return memory->isOtherEnemy(this, localPlayer.get());
     }
 
     
@@ -192,7 +201,6 @@ public:
     NETVAR(body, "CBaseAnimating", "m_nBody", int)
     NETVAR(hitboxSet, "CBaseAnimating", "m_nHitboxSet", int)
 
-    NETVAR_OFFSET(index, "CBaseEntity", "m_bIsAutoaimTarget", 4, int)
     NETVAR(modelIndex, "CBaseEntity", "m_nModelIndex", unsigned)
     NETVAR(origin, "CBaseEntity", "m_vecOrigin", Vector)
     NETVAR_OFFSET(moveType, "CBaseEntity", "m_nRenderMode", 1, MoveType)
