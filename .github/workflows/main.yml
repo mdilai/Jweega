@@ -30,4 +30,4 @@ jobs:
       uses: actions/upload-artifact@v1.0.0
       with: 
         name: JweegaCSGO-${{ github.sha }}
-        path:  .\Release\Jweega.dll
+        path:  .\Jweega\Release\Jweega.dll
