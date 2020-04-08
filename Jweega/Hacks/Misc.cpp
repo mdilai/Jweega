@@ -103,7 +103,7 @@ void Misc::spectatorList() noexcept
     if (!config->misc.spectatorList.enabled && interfaces->engine->isInGame())
         return;
 
-    if ((!localPlayer || !localPlayer->isAlive()) || (!localPlayer->getObserverTarget() || !localPlayer->getObserverTarget()->isAlive()))
+    if (!localPlayer || !localPlayer->isAlive())
         return;
 
     interfaces->surface->setTextFont(Surface::font);
